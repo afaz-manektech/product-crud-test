@@ -55,4 +55,20 @@ class ProductsTest extends TestCase
         $this->assertSame($product->name, 'Updated product');
         $this->assertSame((int) $product->year, 1923);
     }
+
+    /** @test */
+    public function it_deletes_product()
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        $this->assertDatabaseCount('products', 1);
+
+        $response = $this->actingAs($user)->json('DELETE', route('products.destroy', $product));
+        $response->assertSuccessful();
+        $this->assertDatabaseCount('products', 0);
+    }
 }
