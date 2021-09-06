@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function store(ProductRequest $request)
     {
         $data = $request->all();
@@ -19,7 +24,9 @@ class ProductController extends Controller
             $data['photo'] = $path;
         }
 
-        $product = Product::query()->create($data);
+        $product = Product::query()->create(array_merge($data, [
+            'user_id' => auth()->id()
+        ]));
 
         return $product;
     }
