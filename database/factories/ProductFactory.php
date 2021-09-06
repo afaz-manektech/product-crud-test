@@ -24,7 +24,6 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'year' => $this->faker->year(),
-            'photo' => $this->faker->imageUrl(),
         ];
     }
 }
