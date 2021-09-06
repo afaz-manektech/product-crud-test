@@ -14,6 +14,11 @@ class ProductController extends Controller
         $this->middleware('auth');
     }
 
+    public function index()
+    {
+        return Product::all();
+    }
+
     public function store(ProductRequest $request)
     {
         $data = $request->all();
