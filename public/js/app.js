@@ -2113,6 +2113,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
@@ -2136,6 +2138,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
     $(this.$refs.modal).on("hidden.bs.modal", this.modelHidden);
   },
+  computed: {
+    yearOptions: function yearOptions() {
+      var start = 1900;
+      var currentYear = new Date().getFullYear();
+      var options = [];
+
+      for (var i = start; i <= currentYear; i++) {
+        options.push(i);
+      }
+
+      return options;
+    }
+  },
   methods: {
     close: function close() {
       $(this.$refs.modal).modal("hide");
@@ -2147,7 +2162,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this2 = this;
 
       _api_products__WEBPACK_IMPORTED_MODULE_0__["default"].updateProduct(this.product.id, this.form).then(function (updatedProduct) {
-        _this2.$emit('product-updated', updatedProduct);
+        _this2.$emit("product-updated", updatedProduct);
 
         _this2.close();
       });
@@ -37894,7 +37909,7 @@ var render = function() {
     {
       ref: "modal",
       staticClass: "modal fade",
-      attrs: { tabindex: "-1", role: "dialog" }
+      attrs: { tabindex: "-1", role: "dialog", "data-backdrop": "static" }
     },
     [
       _c("div", { staticClass: "modal-dialog", attrs: { role: "document" } }, [
@@ -37948,27 +37963,54 @@ var render = function() {
                 _c("div", { staticClass: "form-group" }, [
                   _c("label", { attrs: { for: "year" } }, [_vm._v("Year")]),
                   _vm._v(" "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.form.year,
-                        expression: "form.year"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: { type: "text", name: "year", id: "year" },
-                    domProps: { value: _vm.form.year },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
+                  _c(
+                    "select",
+                    {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.form.year,
+                          expression: "form.year"
                         }
-                        _vm.$set(_vm.form, "year", $event.target.value)
+                      ],
+                      staticClass: "form-control",
+                      attrs: { name: "year", id: "year" },
+                      on: {
+                        change: function($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function(o) {
+                              return o.selected
+                            })
+                            .map(function(o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.$set(
+                            _vm.form,
+                            "year",
+                            $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          )
+                        }
                       }
-                    }
-                  })
+                    },
+                    [
+                      _c("option", [_vm._v("Select one year")]),
+                      _vm._v(" "),
+                      _vm._l(_vm.yearOptions, function(option) {
+                        return _c("option", { key: option }, [
+                          _vm._v(
+                            "\n                " +
+                              _vm._s(option) +
+                              "\n              "
+                          )
+                        ])
+                      })
+                    ],
+                    2
+                  )
                 ])
               ]),
               _vm._v(" "),
@@ -38006,7 +38048,7 @@ var staticRenderFns = [
       _c(
         "button",
         { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-        [_vm._v("\n            Save changes\n          ")]
+        [_vm._v("Save changes")]
       ),
       _vm._v(" "),
       _c(

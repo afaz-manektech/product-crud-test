@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" tabindex="-1" role="dialog" ref="modal">
+  <div class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" ref="modal">
     <div class="modal-dialog" role="document">
       <form @submit.prevent="save">
         <div class="modal-content">
@@ -28,19 +28,21 @@
 
             <div class="form-group">
               <label for="year">Year</label>
-              <input
-                type="text"
+              <select
                 name="year"
                 id="year"
                 v-model="form.year"
                 class="form-control"
-              />
+              >
+                <option>Select one year</option>
+                <option v-for="option in yearOptions" :key="option">
+                  {{ option }}
+                </option>
+              </select>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">
-              Save changes
-            </button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
             <button
               type="button"
               class="btn btn-secondary"
@@ -55,7 +57,7 @@
   </div>
 </template>
 <script>
-import productsApi from '../api/products'
+import productsApi from "../api/products";
 
 export default {
   props: {
@@ -81,6 +83,20 @@ export default {
     $(this.$refs.modal).on("hidden.bs.modal", this.modelHidden);
   },
 
+  computed: {
+    yearOptions() {
+      const start = 1900;
+      const currentYear = new Date().getFullYear();
+      const options = [];
+
+      for (let i = start; i <= currentYear; i++) {
+        options.push(i);
+      }
+
+      return options;
+    },
+  },
+
   methods: {
     close() {
       $(this.$refs.modal).modal("hide");
@@ -91,11 +107,12 @@ export default {
     },
 
     save() {
-        productsApi.updateProduct(this.product.id, this.form)
-            .then(updatedProduct => {
-                this.$emit('product-updated', updatedProduct)
-                this.close()
-            })
+      productsApi
+        .updateProduct(this.product.id, this.form)
+        .then((updatedProduct) => {
+          this.$emit("product-updated", updatedProduct);
+          this.close();
+        });
     },
   },
 };
