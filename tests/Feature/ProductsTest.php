@@ -30,4 +30,29 @@ class ProductsTest extends TestCase
         $response->assertSuccessful();
         $this->assertDatabaseCount('products', 1);
     }
+
+    /** @test */
+    public function it_updates_products()
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        $response = $this->actingAs($user)->json('PUT', route('products.update', $product), array_merge($product->toArray(), [
+            'name' => 'Updated product',
+            'year' => 1923,
+            'photo' => UploadedFile::fake()->image('product-updated.jpg')
+        ]));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseCount('products', 1);
+        $product->refresh();
+
+        Storage::disk('public')->assertExists('products/product-updated.jpg');
+
+        $this->assertSame($product->name, 'Updated product');
+        $this->assertSame((int) $product->year, 1923);
+    }
 }

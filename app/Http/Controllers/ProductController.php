@@ -30,4 +30,21 @@ class ProductController extends Controller
 
         return $product;
     }
+
+    public function update(ProductRequest $request, Product $product)
+    {
+        $data = $request->all();
+
+        if ($file = $request->file('photo')) {
+            Storage::disk('public')->put($path = "products/{$file->getClientOriginalName()}", $file);
+
+            $data['photo'] = $path;
+        }
+
+        $product = Product::query()->update(array_merge($data, [
+            'user_id' => auth()->id()
+        ]));
+
+        return $product;
+    }
 }
