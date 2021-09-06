@@ -11,7 +11,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth:sanctum');
     }
 
     public function index()
@@ -46,7 +46,7 @@ class ProductController extends Controller
             $data['photo'] = $path;
         }
 
-        $product = Product::query()->update(array_merge($data, [
+        $product->update(array_merge($data, [
             'user_id' => auth()->id()
         ]));
 
