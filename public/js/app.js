@@ -2115,6 +2115,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
@@ -2127,7 +2137,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   data: function data() {
     return {
-      form: _objectSpread({}, this.product)
+      form: _objectSpread({}, this.product),
+      errors: {}
     };
   },
   mounted: function mounted() {
@@ -2161,10 +2172,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     save: function save() {
       var _this2 = this;
 
+      this.errors = {};
       _api_products__WEBPACK_IMPORTED_MODULE_0__["default"].updateProduct(this.product.id, this.form).then(function (updatedProduct) {
         _this2.$emit("product-updated", updatedProduct);
 
         _this2.close();
+      })["catch"](function (error) {
+        if (error.response.status === 422) {
+          _this2.errors = error.response.data.errors || {};
+        }
       });
     }
   }
@@ -37947,6 +37963,7 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
+                    class: { "is-invalid": _vm.errors && _vm.errors.name },
                     attrs: { type: "text", name: "name", id: "name" },
                     domProps: { value: _vm.form.name },
                     on: {
@@ -37957,7 +37974,13 @@ var render = function() {
                         _vm.$set(_vm.form, "name", $event.target.value)
                       }
                     }
-                  })
+                  }),
+                  _vm._v(" "),
+                  _vm.errors && _vm.errors.name
+                    ? _c("div", { staticClass: "invalid-feedback" }, [
+                        _vm._v(_vm._s(_vm.errors.name[0]))
+                      ])
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
@@ -37975,6 +37998,7 @@ var render = function() {
                         }
                       ],
                       staticClass: "form-control",
+                      class: { "is-invalid": _vm.errors && _vm.errors.year },
                       attrs: { name: "year", id: "year" },
                       on: {
                         change: function($event) {
@@ -37997,7 +38021,9 @@ var render = function() {
                       }
                     },
                     [
-                      _c("option", [_vm._v("Select one year")]),
+                      _c("option", { attrs: { value: "" } }, [
+                        _vm._v("Select one year")
+                      ]),
                       _vm._v(" "),
                       _vm._l(_vm.yearOptions, function(option) {
                         return _c("option", { key: option }, [
@@ -38010,7 +38036,13 @@ var render = function() {
                       })
                     ],
                     2
-                  )
+                  ),
+                  _vm._v(" "),
+                  _vm.errors && _vm.errors.year
+                    ? _c("div", { staticClass: "invalid-feedback" }, [
+                        _vm._v(_vm._s(_vm.errors.year[0]))
+                      ])
+                    : _vm._e()
                 ])
               ]),
               _vm._v(" "),

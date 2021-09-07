@@ -1,5 +1,11 @@
 <template>
-  <div class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" ref="modal">
+  <div
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    data-backdrop="static"
+    ref="modal"
+  >
     <div class="modal-dialog" role="document">
       <form @submit.prevent="save">
         <div class="modal-content">
@@ -23,7 +29,9 @@
                 id="name"
                 v-model="form.name"
                 class="form-control"
+                :class="{ 'is-invalid': errors && errors.name }"
               />
+              <div v-if="errors && errors.name" class="invalid-feedback">{{ errors.name[0] }}</div>
             </div>
 
             <div class="form-group">
@@ -33,12 +41,14 @@
                 id="year"
                 v-model="form.year"
                 class="form-control"
+                :class="{ 'is-invalid': errors && errors.year }"
               >
-                <option>Select one year</option>
+                <option value="">Select one year</option>
                 <option v-for="option in yearOptions" :key="option">
                   {{ option }}
                 </option>
               </select>
+              <div v-if="errors && errors.year" class="invalid-feedback">{{ errors.year[0] }}</div>
             </div>
           </div>
           <div class="modal-footer">
@@ -72,6 +82,8 @@ export default {
       form: {
         ...this.product,
       },
+
+      errors: {}
     };
   },
 
@@ -107,11 +119,17 @@ export default {
     },
 
     save() {
+      this.errors = {};
       productsApi
         .updateProduct(this.product.id, this.form)
         .then((updatedProduct) => {
           this.$emit("product-updated", updatedProduct);
           this.close();
+        })
+        .catch((error) => {
+          if (error.response.status === 422) {
+            this.errors = error.response.data.errors || {};
+          }
         });
     },
   },
