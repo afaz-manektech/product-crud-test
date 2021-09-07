@@ -5,7 +5,9 @@ export default {
     },
 
     updateProduct(id, data) {
-        return window.axios.patch(`/api/products/${id}`, data, {
+        data.append('_method', 'PUT');
+
+        return window.axios.post(`/api/products/${id}`, data, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

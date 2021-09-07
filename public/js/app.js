@@ -2389,7 +2389,8 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   updateProduct: function updateProduct(id, data) {
-    return window.axios.patch("/api/products/".concat(id), data, {
+    data.append('_method', 'PUT');
+    return window.axios.post("/api/products/".concat(id), data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
