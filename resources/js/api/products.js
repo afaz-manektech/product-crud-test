@@ -22,5 +22,10 @@ export default {
             }
         })
             .then(response => response.data)
+    },
+
+    deleteProduct(id) {
+        return window.axios.delete(`/api/products/${id}`)
+            .then(response => response.data)
     }
 }

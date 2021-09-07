@@ -29,6 +29,12 @@
               >
                 Edit
               </button>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                @click="deleteProduct(product)"
+              >
+                Delete
+              </button>
             </td>
           </tr>
         </tbody>
@@ -86,6 +92,19 @@ export default {
             name: null,
             year: null,
             image: null,
+        }
+    },
+
+    deleteProduct(product) {
+        if (confirm('Are you sure, you want to delete this product ?')) {
+            productsApi.deleteProduct(product.id)
+                .then(() => {
+                    const index = this.products.findIndex((item) => item.id === product.id)
+
+                    if (index >= 0) {
+                        this.products.splice(index, 1);
+                    }
+                })
         }
     }
   },

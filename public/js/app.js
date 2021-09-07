@@ -2318,6 +2318,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2365,6 +2371,21 @@ __webpack_require__.r(__webpack_exports__);
         year: null,
         image: null
       };
+    },
+    deleteProduct: function deleteProduct(product) {
+      var _this2 = this;
+
+      if (confirm('Are you sure, you want to delete this product ?')) {
+        _api_products__WEBPACK_IMPORTED_MODULE_0__["default"].deleteProduct(product.id).then(function () {
+          var index = _this2.products.findIndex(function (item) {
+            return item.id === product.id;
+          });
+
+          if (index >= 0) {
+            _this2.products.splice(index, 1);
+          }
+        });
+      }
     }
   }
 });
@@ -2404,6 +2425,11 @@ __webpack_require__.r(__webpack_exports__);
         'Content-Type': 'multipart/form-data'
       }
     }).then(function (response) {
+      return response.data;
+    });
+  },
+  deleteProduct: function deleteProduct(id) {
+    return window.axios["delete"]("/api/products/".concat(id)).then(function (response) {
       return response.data;
     });
   }
@@ -38323,6 +38349,19 @@ var render = function() {
                       }
                     },
                     [_vm._v("\n              Edit\n            ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-outline-danger btn-sm",
+                      on: {
+                        click: function($event) {
+                          return _vm.deleteProduct(product)
+                        }
+                      }
+                    },
+                    [_vm._v("\n              Delete\n            ")]
                   )
                 ])
               ])
