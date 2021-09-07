@@ -5,7 +5,20 @@ export default {
     },
 
     updateProduct(id, data) {
-        return window.axios.put(`/api/products/${id}`, data)
+        return window.axios.patch(`/api/products/${id}`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(response => response.data)
+    },
+
+    createProduct(data) {
+        return window.axios.post('/api/products', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
             .then(response => response.data)
     }
 }

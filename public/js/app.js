@@ -2125,6 +2125,36 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
@@ -2138,6 +2168,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   data: function data() {
     return {
       form: _objectSpread({}, this.product),
+      file: null,
       errors: {}
     };
   },
@@ -2160,6 +2191,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
 
       return options;
+    },
+    filePreview: function filePreview() {
+      if (!this.file) {
+        return this.product.photo_url;
+      }
+
+      return URL.createObjectURL(this.file);
     }
   },
   methods: {
@@ -2169,17 +2207,55 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     modelHidden: function modelHidden() {
       this.$emit("modal-closed");
     },
+    handleUpload: function handleUpload(e) {
+      this.file = e.target.files[0] || null;
+    },
     save: function save() {
+      if (this.product.id) {
+        this.updateProduct();
+      } else {
+        this.createProduct();
+      }
+    },
+    getFormData: function getFormData() {
       var _this2 = this;
 
-      this.errors = {};
-      _api_products__WEBPACK_IMPORTED_MODULE_0__["default"].updateProduct(this.product.id, this.form).then(function (updatedProduct) {
-        _this2.$emit("product-updated", updatedProduct);
+      var formData = new FormData();
+      Object.keys(this.form).forEach(function (k) {
+        formData.append(k, _this2.form[k]);
+      });
 
-        _this2.close();
+      if (this.file) {
+        formData.append("photo", this.file);
+      }
+
+      return formData;
+    },
+    updateProduct: function updateProduct() {
+      var _this3 = this;
+
+      this.errors = {};
+      _api_products__WEBPACK_IMPORTED_MODULE_0__["default"].updateProduct(this.product.id, this.getFormData()).then(function (updatedProduct) {
+        _this3.$emit("product-updated", updatedProduct);
+
+        _this3.close();
       })["catch"](function (error) {
         if (error.response.status === 422) {
-          _this2.errors = error.response.data.errors || {};
+          _this3.errors = error.response.data.errors || {};
+        }
+      });
+    },
+    createProduct: function createProduct() {
+      var _this4 = this;
+
+      this.errors = {};
+      _api_products__WEBPACK_IMPORTED_MODULE_0__["default"].createProduct(this.getFormData()).then(function (updatedProduct) {
+        _this4.$emit("product-updated", updatedProduct);
+
+        _this4.close();
+      })["catch"](function (error) {
+        if (error.response.status === 422) {
+          _this4.errors = error.response.data.errors || {};
         }
       });
     }
@@ -2238,7 +2314,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2274,10 +2353,18 @@ __webpack_require__.r(__webpack_exports__);
       });
 
       if (foundIndex === -1) {
+        this.products.push(product);
         return;
       }
 
       this.products.splice(foundIndex, 1, product);
+    },
+    addNewProduct: function addNewProduct() {
+      this.editingProduct = {
+        name: null,
+        year: null,
+        image: null
+      };
     }
   }
 });
@@ -2302,7 +2389,20 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   updateProduct: function updateProduct(id, data) {
-    return window.axios.put("/api/products/".concat(id), data).then(function (response) {
+    return window.axios.patch("/api/products/".concat(id), data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(function (response) {
+      return response.data;
+    });
+  },
+  createProduct: function createProduct(data) {
+    return window.axios.post('/api/products', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(function (response) {
       return response.data;
     });
   }
@@ -37942,9 +38042,17 @@ var render = function() {
           [
             _c("div", { staticClass: "modal-content" }, [
               _c("div", { staticClass: "modal-header" }, [
-                _c("h5", { staticClass: "modal-title" }, [
-                  _vm._v("Editing " + _vm._s(_vm.product.name))
-                ]),
+                this.product.id
+                  ? _c("h5", { staticClass: "modal-title" }, [
+                      _vm._v(
+                        "\n            Editing " +
+                          _vm._s(_vm.product.name) +
+                          "\n          "
+                      )
+                    ])
+                  : _c("h5", { staticClass: "modal-title" }, [
+                      _vm._v("Add new product")
+                    ]),
                 _vm._v(" "),
                 _vm._m(0)
               ]),
@@ -37978,7 +38086,11 @@ var render = function() {
                   _vm._v(" "),
                   _vm.errors && _vm.errors.name
                     ? _c("div", { staticClass: "invalid-feedback" }, [
-                        _vm._v(_vm._s(_vm.errors.name[0]))
+                        _vm._v(
+                          "\n              " +
+                            _vm._s(_vm.errors.name[0]) +
+                            "\n            "
+                        )
                       ])
                     : _vm._e()
                 ]),
@@ -38040,7 +38152,54 @@ var render = function() {
                   _vm._v(" "),
                   _vm.errors && _vm.errors.year
                     ? _c("div", { staticClass: "invalid-feedback" }, [
-                        _vm._v(_vm._s(_vm.errors.year[0]))
+                        _vm._v(
+                          "\n              " +
+                            _vm._s(_vm.errors.year[0]) +
+                            "\n            "
+                        )
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "custom-file form-group" }, [
+                  _c("label", { attrs: { for: "photo" } }, [_vm._v("Photo")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "custom-file-input",
+                    class: { "is-invalid": _vm.errors && _vm.errors.photo },
+                    attrs: { type: "file", id: "photo", accept: "image/*" },
+                    on: { change: _vm.handleUpload }
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "label",
+                    {
+                      staticClass: "custom-file-label",
+                      attrs: { for: "photo" }
+                    },
+                    [_vm._v("Choose photo")]
+                  ),
+                  _vm._v(" "),
+                  _vm.errors && _vm.errors.photo
+                    ? _c("div", { staticClass: "invalid-feedback" }, [
+                        _vm._v(
+                          "\n              " +
+                            _vm._s(_vm.errors.photo[0]) +
+                            "\n            "
+                        )
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _vm.filePreview
+                    ? _c("div", { staticClass: "col-4" }, [
+                        _c("label", [_vm._v("Image Preview")]),
+                        _vm._v(" "),
+                        _c("img", {
+                          staticClass: "img-thumbnail",
+                          attrs: { src: _vm.filePreview }
+                        })
                       ])
                     : _vm._e()
                 ])
@@ -38120,7 +38279,22 @@ var render = function() {
     "div",
     { staticClass: "products-component" },
     [
-      _c("h1", [_vm._v("Products")]),
+      _c(
+        "div",
+        { staticClass: "d-flex justify-content-between align-items-end" },
+        [
+          _c("h1", [_vm._v("Products")]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-sm btn-outline-primary",
+              on: { click: _vm.addNewProduct }
+            },
+            [_vm._v("New Product")]
+          )
+        ]
+      ),
       _vm._v(" "),
       _c("div", { staticClass: "card mt-4" }, [
         _c("table", { staticClass: "table m-0 table-striped" }, [

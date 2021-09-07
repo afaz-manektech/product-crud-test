@@ -25,9 +25,9 @@ class ProductController extends Controller
         $data = $request->all();
 
         if ($file = $request->file('photo')) {
-            Storage::disk('public')->put($path = "products/{$file->getClientOriginalName()}", $file);
+            $file->move(public_path('/storage/products'), $file->getClientOriginalName());
 
-            $data['photo'] = $path;
+            $data['photo'] = "products/{$file->getClientOriginalName()}";
         }
 
         $product = Product::query()->create(array_merge($data, [
@@ -42,9 +42,9 @@ class ProductController extends Controller
         $data = $request->all();
 
         if ($file = $request->file('photo')) {
-            Storage::disk('public')->put($path = "products/{$file->getClientOriginalName()}", $file);
+            $file->move(public_path('/storage/products'));
 
-            $data['photo'] = $path;
+            $data['photo'] = "products/{$file->getClientOriginalName()}";
         }
 
         $product->update(array_merge($data, [

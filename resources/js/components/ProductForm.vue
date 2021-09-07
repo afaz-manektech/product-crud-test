@@ -10,7 +10,10 @@
       <form @submit.prevent="save">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Editing {{ product.name }}</h5>
+            <h5 class="modal-title" v-if="this.product.id">
+              Editing {{ product.name }}
+            </h5>
+            <h5 class="modal-title" v-else>Add new product</h5>
             <button
               type="button"
               class="close"
@@ -31,7 +34,9 @@
                 class="form-control"
                 :class="{ 'is-invalid': errors && errors.name }"
               />
-              <div v-if="errors && errors.name" class="invalid-feedback">{{ errors.name[0] }}</div>
+              <div v-if="errors && errors.name" class="invalid-feedback">
+                {{ errors.name[0] }}
+              </div>
             </div>
 
             <div class="form-group">
@@ -48,7 +53,32 @@
                   {{ option }}
                 </option>
               </select>
-              <div v-if="errors && errors.year" class="invalid-feedback">{{ errors.year[0] }}</div>
+              <div v-if="errors && errors.year" class="invalid-feedback">
+                {{ errors.year[0] }}
+              </div>
+            </div>
+
+            <div class="custom-file form-group">
+              <label for="photo">Photo</label>
+              <input
+                type="file"
+                class="custom-file-input"
+                id="photo"
+                accept="image/*"
+                :class="{ 'is-invalid': errors && errors.photo }"
+                @change="handleUpload"
+              />
+              <label class="custom-file-label" for="photo">Choose photo</label>
+              <div v-if="errors && errors.photo" class="invalid-feedback">
+                {{ errors.photo[0] }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div v-if="filePreview" class="col-4">
+                <label>Image Preview</label>
+                <img :src="filePreview" class="img-thumbnail" />
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -83,7 +113,9 @@ export default {
         ...this.product,
       },
 
-      errors: {}
+      file: null,
+
+      errors: {},
     };
   },
 
@@ -107,6 +139,14 @@ export default {
 
       return options;
     },
+
+    filePreview() {
+      if (!this.file) {
+        return this.product.photo_url;
+      }
+
+      return URL.createObjectURL(this.file);
+    },
   },
 
   methods: {
@@ -118,10 +158,52 @@ export default {
       this.$emit("modal-closed");
     },
 
+    handleUpload(e) {
+      this.file = e.target.files[0] || null;
+    },
+
     save() {
+      if (this.product.id) {
+        this.updateProduct();
+      } else {
+        this.createProduct();
+      }
+    },
+
+    getFormData() {
+      const formData = new FormData();
+
+      Object.keys(this.form).forEach((k) => {
+        formData.append(k, this.form[k]);
+      });
+
+      if (this.file) {
+        formData.append("photo", this.file);
+      }
+
+      return formData;
+    },
+
+    updateProduct() {
+      this.errors = {};
+
+      productsApi
+        .updateProduct(this.product.id, this.getFormData())
+        .then((updatedProduct) => {
+          this.$emit("product-updated", updatedProduct);
+          this.close();
+        })
+        .catch((error) => {
+          if (error.response.status === 422) {
+            this.errors = error.response.data.errors || {};
+          }
+        });
+    },
+
+    createProduct() {
       this.errors = {};
       productsApi
-        .updateProduct(this.product.id, this.form)
+        .createProduct(this.getFormData())
         .then((updatedProduct) => {
           this.$emit("product-updated", updatedProduct);
           this.close();

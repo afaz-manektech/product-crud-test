@@ -1,6 +1,10 @@
 <template>
   <div class="products-component">
-    <h1>Products</h1>
+    <div class="d-flex justify-content-between align-items-end">
+        <h1>Products</h1>
+
+        <button class="btn btn-sm btn-outline-primary" @click="addNewProduct">New Product</button>
+    </div>
 
     <div class="card mt-4">
       <table class="table m-0 table-striped">
@@ -36,7 +40,6 @@
 </template>
 
 <script>
-import products from '../api/products';
 import productsApi from "../api/products";
 import ProductForm from "./ProductForm.vue";
 
@@ -71,10 +74,19 @@ export default {
         const foundIndex = this.products.findIndex(item => item.id === product.id)
 
         if (foundIndex === -1) {
+            this.products.push(product)
             return
         }
 
         this.products.splice(foundIndex, 1, product)
+    },
+
+    addNewProduct() {
+        this.editingProduct = {
+            name: null,
+            year: null,
+            image: null,
+        }
     }
   },
 };
